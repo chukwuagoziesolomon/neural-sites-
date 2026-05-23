@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neural Sites — Digital Agency</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -70,7 +71,10 @@
   .service-card:hover .s-num { color:var(--accent); }
   .service-card:hover .s-arrow { opacity:1; transform:translateX(0); }
   .s-num { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--text-dim); letter-spacing:.1em; margin-bottom:26px; transition:color .3s; }
-  .s-icon { font-size:2rem; margin-bottom:18px; display:block; }
+  .s-icon { width:36px; height:36px; margin-bottom:18px; display:block; color:var(--white); transition:color .3s; }
+  .service-card:hover .s-icon { color:var(--accent); }
+  .mo-icon { display:flex; align-items:center; justify-content:center; width:28px; height:28px; flex-shrink:0; transition:color .25s; }
+  .mo-icon svg { width:24px; height:24px; }
   .s-name { font-size:1.15rem; font-weight:700; letter-spacing:-.02em; margin-bottom:12px; }
   .s-desc { color:var(--text-dim); font-size:.87rem; line-height:1.65; }
   .s-arrow { position:absolute; bottom:32px; right:32px; color:var(--accent); opacity:0; transform:translateX(-8px); transition:opacity .3s,transform .3s; font-size:1.1rem; }
@@ -210,35 +214,35 @@
   <div class="services-grid">
     <div class="service-card reveal d1">
       <div class="s-num">01 / 05</div>
-      <span class="s-icon">🌐</span>
+      <i data-lucide="globe" class="s-icon"></i>
       <div class="s-name">Website Development</div>
       <p class="s-desc">Fast, responsive, and beautifully designed web experiences. From marketing sites to complex web applications built to perform.</p>
       <span class="s-arrow">→</span>
     </div>
     <div class="service-card reveal d2">
       <div class="s-num">02 / 05</div>
-      <span class="s-icon">🧠</span>
+      <i data-lucide="cpu" class="s-icon"></i>
       <div class="s-name">AI & Machine Learning</div>
       <p class="s-desc">Custom ML systems using LSTM, Reinforcement Learning, CNNs, and Deep Neural Networks — from intelligent trading infrastructure to predictive analytics and automation engines.</p>
       <span class="s-arrow">→</span>
     </div>
     <div class="service-card reveal d3">
       <div class="s-num">03 / 05</div>
-      <span class="s-icon">🛒</span>
+      <i data-lucide="shopping-cart" class="s-icon"></i>
       <div class="s-name">E-Commerce Platforms</div>
       <p class="s-desc">Full-featured online stores with crypto & Naira payment support, inventory management, and high-converting UX that sells.</p>
       <span class="s-arrow">→</span>
     </div>
     <div class="service-card reveal d1">
       <div class="s-num">04 / 05</div>
-      <span class="s-icon">🏦</span>
+      <i data-lucide="landmark" class="s-icon"></i>
       <div class="s-name">Fintech & Banking Apps</div>
       <p class="s-desc">Secure digital banking platforms, investment dashboards, and wealth management portals built with compliance and scale in mind.</p>
       <span class="s-arrow">→</span>
     </div>
     <div class="service-card reveal d2" style="grid-column:span 2;">
       <div class="s-num">05 / 05</div>
-      <span class="s-icon">📊</span>
+      <i data-lucide="bar-chart-2" class="s-icon"></i>
       <div class="s-name">Investment & Analytics Platforms</div>
       <p class="s-desc">Real-time dashboards, portfolio management tools, and data analytics platforms that help businesses and individuals make smarter financial decisions. We bring institutional-grade tools to every client.</p>
       <span class="s-arrow">→</span>
@@ -322,7 +326,7 @@
 
 <!-- CTA -->
 <section id="contact">
-  <p class="section-label reveal" style="margin-bottom:18px;">⬡ Let's Build Together</p>
+  <p class="section-label reveal" style="margin-bottom:18px;">Let's Build Together</p>
   <h2 class="cta-title reveal d1">Have a Project<br>In <span>Mind?</span></h2>
   <p class="cta-sub reveal d2">We've shipped banks, AI bots, and e-commerce stores. Tell us what you need — we'll build it right.</p>
   <button class="btn-primary reveal d3" onclick="openModal()">Book a Call With Us</button>
@@ -343,21 +347,21 @@
     <p class="modal-subtitle">Choose how you'd like to reach us. We respond fast and speak your language — no tech jargon.</p>
     <div class="modal-options">
       <a href="tel:09160007451" class="modal-option">
-        <span class="mo-icon">📞</span>
+        <span class="mo-icon"><i data-lucide="phone"></i></span>
         <div>
           <div class="mo-label">Call Us Directly</div>
           <div class="mo-value">0916 000 7451</div>
         </div>
       </a>
       <a href="mailto:hello@neuralsites.ng" class="modal-option">
-        <span class="mo-icon">✉️</span>
+        <span class="mo-icon"><i data-lucide="mail"></i></span>
         <div>
           <div class="mo-label">Send an Email</div>
           <div class="mo-value">hello@neuralsites.ng</div>
         </div>
       </a>
       <a href="https://wa.me/2349160007451" target="_blank" class="modal-option">
-        <span class="mo-icon">💬</span>
+        <span class="mo-icon"><i data-lucide="message-circle"></i></span>
         <div>
           <div class="mo-label">WhatsApp Us</div>
           <div class="mo-value">Chat on WhatsApp</div>
@@ -399,6 +403,7 @@
   function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
   function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  lucide.createIcons();
 </script>
 </body>
 </html>
