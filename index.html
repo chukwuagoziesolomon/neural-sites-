@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Sites — Digital Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --black: #050508; --white: #f4f2ee;
+    --accent: #c8ff00; --accent2: #00ffd1;
+    --grey: #111116; --grey2: #1e1e26; --grey3: #2a2a36;
+    --text-dim: #6a6a7c;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Syne', sans-serif; overflow-x: hidden; cursor: none; }
+
+  .cursor { position: fixed; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s,height .2s,background .2s; mix-blend-mode: difference; }
+  .cursor-ring { position: fixed; width: 38px; height: 38px; border: 1px solid rgba(200,255,0,0.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: width .18s,height .18s; }
+
+  body::after { content:''; position:fixed; inset:0; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; opacity:.35; }
+
+  /* NAV */
+  nav { position:fixed; top:0; width:100%; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:22px 60px; background:linear-gradient(to bottom,rgba(5,5,8,.96),transparent); }
+  .nav-logo { font-size:1.2rem; font-weight:800; letter-spacing:-.03em; }
+  .nav-logo span { color:var(--accent); }
+  .nav-links { display:flex; gap:36px; list-style:none; }
+  .nav-links a { color:var(--text-dim); text-decoration:none; font-size:.82rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; transition:color .25s; }
+  .nav-links a:hover { color:var(--accent); }
+
+  /* HERO */
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:140px 60px 80px; position:relative; overflow:hidden; }
+  .hero-bg-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(200,255,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,255,0,.04) 1px,transparent 1px); background-size:64px 64px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent); }
+  .orb { position:absolute; border-radius:50%; filter:blur(90px); pointer-events:none; }
+  .orb1 { width:550px; height:550px; background:var(--accent); right:-80px; top:5%; opacity:.1; animation:float 9s ease-in-out infinite; }
+  .orb2 { width:300px; height:300px; background:var(--accent2); right:25%; bottom:5%; opacity:.08; animation:float 7s ease-in-out 3s infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-28px) scale(1.04)} }
+
+  .hero-eyebrow { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--accent); letter-spacing:.16em; text-transform:uppercase; margin-bottom:26px; opacity:0; animation:fadeUp .8s ease .2s forwards; display:flex; align-items:center; gap:12px; }
+  .hero-eyebrow::before { content:''; display:block; width:28px; height:1px; background:var(--accent); }
+  .hero h1 { font-size:clamp(3.2rem,8.5vw,7.5rem); font-weight:800; line-height:.9; letter-spacing:-.05em; max-width:860px; opacity:0; animation:fadeUp .9s ease .35s forwards; }
+  .hero h1 em { font-style:normal; color:var(--accent); }
+  .hero-sub { margin-top:32px; max-width:500px; color:var(--text-dim); font-size:1rem; line-height:1.75; opacity:0; animation:fadeUp .9s ease .5s forwards; }
+  .hero-cta { margin-top:48px; display:flex; gap:18px; align-items:center; flex-wrap:wrap; opacity:0; animation:fadeUp .9s ease .65s forwards; }
+
+  /* BUTTONS */
+  .btn-primary { background:var(--accent); color:var(--black); border:none; padding:15px 34px; font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; cursor:none; transition:transform .25s,box-shadow .25s; clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px)); }
+  .btn-primary:hover { transform:translateY(-3px); box-shadow:0 14px 40px rgba(200,255,0,.3); }
+  .btn-ghost { background:transparent; color:var(--white); border:1px solid var(--grey3); padding:15px 34px; font-family:'Syne',sans-serif; font-size:.9rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase; cursor:none; text-decoration:none; transition:border-color .25s,color .25s; clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px)); display:inline-block; }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* MARQUEE */
+  .marquee-wrap { border-top:1px solid var(--grey2); border-bottom:1px solid var(--grey2); padding:16px 0; overflow:hidden; background:var(--grey); }
+  .marquee-track { display:flex; gap:56px; width:max-content; animation:marquee 22s linear infinite; }
+  .marquee-item { font-family:'DM Mono',monospace; font-size:.75rem; letter-spacing:.1em; color:var(--text-dim); white-space:nowrap; display:flex; align-items:center; gap:18px; }
+  .marquee-item::after { content:'◆'; color:var(--accent); font-size:.45rem; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* SERVICES */
+  #services { padding:110px 60px; }
+  .section-label { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent); letter-spacing:.16em; text-transform:uppercase; margin-bottom:14px; }
+  .section-title { font-size:clamp(1.9rem,3.8vw,3.2rem); font-weight:800; letter-spacing:-.04em; line-height:1.05; }
+  .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:60px; }
+  .services-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+  .service-card { background:var(--grey); padding:38px 32px; position:relative; overflow:hidden; cursor:none; transition:background .3s; }
+  .service-card::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(200,255,0,.07),transparent); opacity:0; transition:opacity .3s; }
+  .service-card:hover { background:var(--grey2); }
+  .service-card:hover::after { opacity:1; }
+  .service-card:hover .s-num { color:var(--accent); }
+  .service-card:hover .s-arrow { opacity:1; transform:translateX(0); }
+  .s-num { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--text-dim); letter-spacing:.1em; margin-bottom:26px; transition:color .3s; }
+  .s-icon { font-size:2rem; margin-bottom:18px; display:block; }
+  .s-name { font-size:1.15rem; font-weight:700; letter-spacing:-.02em; margin-bottom:12px; }
+  .s-desc { color:var(--text-dim); font-size:.87rem; line-height:1.65; }
+  .s-arrow { position:absolute; bottom:32px; right:32px; color:var(--accent); opacity:0; transform:translateX(-8px); transition:opacity .3s,transform .3s; font-size:1.1rem; }
+
+  /* STATS */
+  .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; background:var(--grey2); }
+  .stat-box { background:var(--black); padding:52px 36px; text-align:center; }
+  .stat-num { font-size:clamp(2.2rem,4vw,3.5rem); font-weight:800; color:var(--accent); letter-spacing:-.05em; line-height:1; }
+  .stat-label { color:var(--text-dim); font-size:.78rem; margin-top:10px; letter-spacing:.07em; text-transform:uppercase; }
+
+  /* PROJECTS */
+  #projects { padding:110px 60px; background:var(--grey); }
+  .projects-list { display:flex; flex-direction:column; gap:2px; margin-top:60px; }
+  .project-row { display:grid; grid-template-columns:80px 1fr 2fr auto; align-items:center; gap:32px; background:var(--black); padding:32px 36px; border:1px solid transparent; transition:border-color .3s,background .3s; cursor:none; text-decoration:none; color:var(--white); }
+  .project-row:hover { border-color:var(--accent); background:rgba(200,255,0,.02); }
+  .project-row:hover .p-num { color:var(--accent); }
+  .project-row:hover .p-link { opacity:1; transform:translateX(0); color:var(--accent); }
+  .p-num { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--text-dim); letter-spacing:.08em; transition:color .3s; }
+  .p-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; padding:4px 12px; border:1px solid var(--grey3); color:var(--text-dim); white-space:nowrap; }
+  .p-name { font-size:1.35rem; font-weight:700; letter-spacing:-.02em; margin-bottom:6px; }
+  .p-desc { color:var(--text-dim); font-size:.85rem; line-height:1.55; }
+  .p-link { font-size:.8rem; font-family:'DM Mono',monospace; color:var(--text-dim); opacity:0; transform:translateX(-6px); transition:opacity .3s,transform .3s,color .3s; white-space:nowrap; }
+
+  /* CTA */
+  #contact { padding:120px 60px; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; overflow:hidden; }
+  #contact::before { content:''; position:absolute; width:700px; height:700px; background:radial-gradient(circle,rgba(200,255,0,.07) 0%,transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+  .cta-title { font-size:clamp(2.4rem,5.5vw,5rem); font-weight:800; letter-spacing:-.05em; line-height:.95; max-width:720px; margin-bottom:20px; }
+  .cta-title span { color:var(--accent); }
+  .cta-sub { color:var(--text-dim); font-size:.97rem; margin-bottom:48px; max-width:400px; line-height:1.7; }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(5,5,8,.88); backdrop-filter:blur(14px); z-index:1000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; animation:fadeIn .2s ease forwards; }
+  .modal-box { background:var(--grey2); border:1px solid var(--grey3); padding:52px 48px; max-width:460px; width:90%; position:relative; clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px)); animation:scaleIn .28s ease forwards; }
+  .modal-close { position:absolute; top:18px; right:20px; background:none; border:none; color:var(--text-dim); font-size:1.3rem; cursor:none; transition:color .2s; }
+  .modal-close:hover { color:var(--accent); }
+  .modal-eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--accent); letter-spacing:.15em; text-transform:uppercase; margin-bottom:10px; }
+  .modal-title { font-size:1.65rem; font-weight:800; letter-spacing:-.03em; margin-bottom:8px; }
+  .modal-subtitle { color:var(--text-dim); font-size:.88rem; margin-bottom:34px; line-height:1.6; }
+  .modal-options { display:flex; flex-direction:column; gap:12px; }
+  .modal-option { display:flex; align-items:center; gap:18px; background:var(--black); border:1px solid var(--grey3); padding:20px 22px; text-decoration:none; color:var(--white); transition:border-color .25s,transform .25s,background .25s; cursor:none; }
+  .modal-option:hover { border-color:var(--accent); background:rgba(200,255,0,.03); transform:translateX(6px); }
+  .modal-option:hover .mo-icon { color:var(--accent); }
+  .mo-icon { font-size:1.4rem; transition:color .25s; flex-shrink:0; }
+  .mo-label { font-family:'DM Mono',monospace; font-size:.67rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:3px; }
+  .mo-value { font-size:.97rem; font-weight:600; }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--grey2); padding:28px 60px; display:flex; align-items:center; justify-content:space-between; background:var(--grey); }
+  .footer-logo { font-size:.95rem; font-weight:800; }
+  .footer-logo span { color:var(--accent); }
+  .footer-copy { color:var(--text-dim); font-size:.75rem; font-family:'DM Mono',monospace; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(26px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes scaleIn { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:scale(1)} }
+  .reveal { opacity:0; transform:translateY(26px); transition:opacity .7s ease,transform .7s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s}
+
+  @media(max-width:920px){
+    nav{padding:20px 24px;} .nav-links{display:none;}
+    .hero,#services,#projects,#contact{padding:100px 24px 60px;}
+    .services-grid{grid-template-columns:1fr;}
+    .service-card{grid-column:unset!important;}
+    .stats-strip{grid-template-columns:repeat(2,1fr);}
+    .project-row{grid-template-columns:1fr; gap:10px;}
+    .p-num,.p-link{display:none;}
+    .section-header{flex-direction:column;align-items:flex-start;gap:8px;}
+    footer{flex-direction:column;gap:12px;text-align:center;padding:24px;}
+    .modal-box{padding:36px 26px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Neural<span>Sites</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <p class="hero-eyebrow">Digital Agency — Port Harcourt, NG</p>
+  <h1>We Turn<br>Ideas Into<br><em>Live Products.</em></h1>
+  <p class="hero-sub">Neural Sites builds websites, AI-powered tools, and e-commerce platforms that ship fast and scale further. From concept to deployment.</p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="openModal()">Book a Call With Us</button>
+    <a href="#projects" class="btn-ghost">See Our Work</a>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Web Development</span>
+    <span class="marquee-item">Machine Learning & AI</span>
+    <span class="marquee-item">E-Commerce Stores</span>
+    <span class="marquee-item">Fintech Platforms</span>
+    <span class="marquee-item">AI Trading Bots</span>
+    <span class="marquee-item">Investment Portals</span>
+    <span class="marquee-item">Digital Banking</span>
+    <span class="marquee-item">UI/UX Design</span>
+    <span class="marquee-item">API Development</span>
+    <span class="marquee-item">Web Development</span>
+    <span class="marquee-item">Machine Learning & AI</span>
+    <span class="marquee-item">E-Commerce Stores</span>
+    <span class="marquee-item">Fintech Platforms</span>
+    <span class="marquee-item">AI Trading Bots</span>
+    <span class="marquee-item">Investment Portals</span>
+    <span class="marquee-item">Digital Banking</span>
+    <span class="marquee-item">UI/UX Design</span>
+    <span class="marquee-item">API Development</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <div>
+      <p class="section-label">What We Build</p>
+      <h2 class="section-title">Full-Stack Expertise<br>Across Every Layer</h2>
+    </div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal d1">
+      <div class="s-num">01 / 05</div>
+      <span class="s-icon">🌐</span>
+      <div class="s-name">Website Development</div>
+      <p class="s-desc">Fast, responsive, and beautifully designed web experiences. From marketing sites to complex web applications built to perform.</p>
+      <span class="s-arrow">→</span>
+    </div>
+    <div class="service-card reveal d2">
+      <div class="s-num">02 / 05</div>
+      <span class="s-icon">🧠</span>
+      <div class="s-name">AI & Machine Learning</div>
+      <p class="s-desc">Custom ML systems using LSTM, Reinforcement Learning, CNNs, and Deep Neural Networks — from intelligent trading infrastructure to predictive analytics and automation engines.</p>
+      <span class="s-arrow">→</span>
+    </div>
+    <div class="service-card reveal d3">
+      <div class="s-num">03 / 05</div>
+      <span class="s-icon">🛒</span>
+      <div class="s-name">E-Commerce Platforms</div>
+      <p class="s-desc">Full-featured online stores with crypto & Naira payment support, inventory management, and high-converting UX that sells.</p>
+      <span class="s-arrow">→</span>
+    </div>
+    <div class="service-card reveal d1">
+      <div class="s-num">04 / 05</div>
+      <span class="s-icon">🏦</span>
+      <div class="s-name">Fintech & Banking Apps</div>
+      <p class="s-desc">Secure digital banking platforms, investment dashboards, and wealth management portals built with compliance and scale in mind.</p>
+      <span class="s-arrow">→</span>
+    </div>
+    <div class="service-card reveal d2" style="grid-column:span 2;">
+      <div class="s-num">05 / 05</div>
+      <span class="s-icon">📊</span>
+      <div class="s-name">Investment & Analytics Platforms</div>
+      <p class="s-desc">Real-time dashboards, portfolio management tools, and data analytics platforms that help businesses and individuals make smarter financial decisions. We bring institutional-grade tools to every client.</p>
+      <span class="s-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat-box reveal">
+    <div class="stat-num" data-target="4" data-suffix="+">0</div>
+    <div class="stat-label">Live Products</div>
+  </div>
+  <div class="stat-box reveal d1">
+    <div class="stat-num" data-target="100" data-suffix="%">0</div>
+    <div class="stat-label">On-Time Delivery</div>
+  </div>
+  <div class="stat-box reveal d2">
+    <div class="stat-num" data-target="5" data-suffix="+">0</div>
+    <div class="stat-label">Industries Covered</div>
+  </div>
+  <div class="stat-box reveal d3">
+    <div class="stat-num" data-target="3" data-suffix="yr">0</div>
+    <div class="stat-label">Years Building</div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header">
+    <div>
+      <p class="section-label">Our Work</p>
+      <h2 class="section-title">Products We've<br>Shipped</h2>
+    </div>
+  </div>
+
+  <div class="projects-list">
+
+    <a href="https://fluxpoint-frontend.vercel.app/" target="_blank" class="project-row reveal">
+      <div class="p-num">01</div>
+      <div class="p-badge">AI / ML Trading</div>
+      <div>
+        <div class="p-name">Fluxpoint — Intelligent Trading Infrastructure</div>
+        <div class="p-desc">A full ML-powered trading system built to automate and optimize trading decisions at scale. Uses LSTM networks for price sequence prediction, Reinforcement Learning for adaptive strategy execution, CNNs for pattern recognition in market charts, and Deep Neural Networks for signal generation — all working together to identify opportunities, eliminate emotion from trading, and continuously improve over time.</div>
+      </div>
+      <div class="p-link">Visit Site →</div>
+    </a>
+
+    <a href="https://www.assetra.org/" target="_blank" class="project-row reveal d1">
+      <div class="p-num">02</div>
+      <div class="p-badge">Fintech / Investment</div>
+      <div>
+        <div class="p-name">Assetra — Investment Banking Platform</div>
+        <div class="p-desc">Premium wealth management platform with real-time portfolio analytics, multi-app integrations (Stripe, Xero, Wise, Coinbase), expense tracking, virtual cards, and institutional-grade financial tools.</div>
+      </div>
+      <div class="p-link">Visit Site →</div>
+    </a>
+
+    <a href="https://www.bitgadgetz.store/" target="_blank" class="project-row reveal d2">
+      <div class="p-num">03</div>
+      <div class="p-badge">E-Commerce</div>
+      <div>
+        <div class="p-name">BitGadgetz — Gadgets Store</div>
+        <div class="p-desc">A modern e-commerce store for gadgets and accessories accepting both crypto and Naira payments. Sleek mobile-first design with a fast shopping experience built for the Nigerian market.</div>
+      </div>
+      <div class="p-link">Visit Site →</div>
+    </a>
+
+    <a href="https://www.midwestern.live/" target="_blank" class="project-row reveal d3">
+      <div class="p-num">04</div>
+      <div class="p-badge">Digital Banking</div>
+      <div>
+        <div class="p-name">Mid-Western Bank — Digital Banking</div>
+        <div class="p-desc">A full-scale digital banking platform with account management, 24/7 security, $2.5B+ assets managed, 50K+ clients onboarded, and 99.9% uptime. Built for trust and scale.</div>
+      </div>
+      <div class="p-link">Visit Site →</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <p class="section-label reveal" style="margin-bottom:18px;">⬡ Let's Build Together</p>
+  <h2 class="cta-title reveal d1">Have a Project<br>In <span>Mind?</span></h2>
+  <p class="cta-sub reveal d2">We've shipped banks, AI bots, and e-commerce stores. Tell us what you need — we'll build it right.</p>
+  <button class="btn-primary reveal d3" onclick="openModal()">Book a Call With Us</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Neural<span>Sites</span></div>
+  <div class="footer-copy">© 2025 Neural Sites. Port Harcourt, NG. All rights reserved.</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <p class="modal-eyebrow">Get in Touch</p>
+    <h3 class="modal-title">Book a Call</h3>
+    <p class="modal-subtitle">Choose how you'd like to reach us. We respond fast and speak your language — no tech jargon.</p>
+    <div class="modal-options">
+      <a href="tel:09160007451" class="modal-option">
+        <span class="mo-icon">📞</span>
+        <div>
+          <div class="mo-label">Call Us Directly</div>
+          <div class="mo-value">0916 000 7451</div>
+        </div>
+      </a>
+      <a href="mailto:hello@neuralsites.ng" class="modal-option">
+        <span class="mo-icon">✉️</span>
+        <div>
+          <div class="mo-label">Send an Email</div>
+          <div class="mo-value">hello@neuralsites.ng</div>
+        </div>
+      </a>
+      <a href="https://wa.me/2349160007451" target="_blank" class="modal-option">
+        <span class="mo-icon">💬</span>
+        <div>
+          <div class="mo-label">WhatsApp Us</div>
+          <div class="mo-value">Chat on WhatsApp</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cursor
+  const cur = document.getElementById('cursor'), ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function tick(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.13;ry+=(my-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  document.querySelectorAll('a,button,.service-card,.project-row').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';ring.style.width='56px';ring.style.height='56px';});
+    el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='38px';ring.style.height='38px';});
+  });
+
+  // Scroll reveal
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // Counters
+  const cObs=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(!e.isIntersecting)return;
+      const el=e.target,target=+el.dataset.target,suffix=el.dataset.suffix||'';
+      let cur=0; const step=target/(1400/16);
+      const t=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(t);}el.textContent=Math.floor(cur)+suffix;},16);
+      cObs.unobserve(el);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('.stat-num').forEach(el=>cObs.observe(el));
+
+  // Modal
+  function openModal(){document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden';}
+  function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+  function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
